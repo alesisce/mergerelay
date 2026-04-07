@@ -8,10 +8,10 @@ from pathlib import Path
 database_config = Config(Path(__file__).resolve().parent.parent, "database.json")
 server_config = Config(Path(__file__).resolve().parent.parent, "server.json")
 db = Database(
-    host=database_config.get_key("host"),
-    user=database_config.get_key("user"),
-    password=database_config.get_key("password"),
-    database=database_config.get_key("database")
+    database_config.get_key("host"),
+    database_config.get_key("user"),
+    database_config.get_key("password"),
+    database_config.get_key("database")
 )
 protocol = Protocol(db)
 

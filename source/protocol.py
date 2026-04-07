@@ -1,4 +1,4 @@
-import asyncio, time
+import asyncio
 from fastapi import WebSocket
 from source.database import Database
 
@@ -18,30 +18,18 @@ class Protocol(object):
         if user_id in self.actives:
             del self.actives[user_id]
 
-    async def broadcast(self, sender_id: int, channel_id: int, message: str, username: str):
+    async def broadcast(self, channel_id: int, data: dict):
         participants = self.db.get_channel_participants(channel_id)
-
-        if not sender_id in participants: return
-        if not sender_id in self.actives: return
 
         tasks = []
         p_ids = []
 
-        payload = {
-            "type": "message",
-            "channel_id": channel_id,
-            "sender_id": sender_id,
-            "sender_name": username, 
-            "timestamp": time.time(),
-            "content": message
-        }
-
         for participant in participants:
             p_id = participant["id"]
-            if p_id in self.actives and p_id != sender_id:
+            if p_id in self.actives:
                 socket = self.actives[p_id]
                 p_ids.append(p_id)
-                tasks.append(socket.send_json(payload))
+                tasks.append(socket.send_json(data))
                 
         if tasks:
             results = await asyncio.gather(*tasks, return_exceptions=True)

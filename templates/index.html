@@ -1,678 +1,671 @@
 <!DOCTYPE html>
 <html lang="es" class="dark">
-<!-- Tema fijado exclusivamente a dark mode, sin toggle de tema -->
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MergeRelay by Alesis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Syne:wght@400;600;700;800&display=swap"
-        rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        mono: ['JetBrains Mono', 'monospace'],
-                        display: ['Syne', 'sans-serif'],
-                    },
-                    colors: {
-                        dark: {
-                            bg: '#0d0f14',
-                            surface: '#13161e',
-                            panel: '#181c26',
-                            border: '#252a38',
-                            muted: '#2e3447',
-                            text: '#e2e8f8',
-                            sub: '#8892a8',
-                            accent: '#5b7fff',
-                            accent2: '#7c5bff',
-                            ping: '#ff5b8a',
-                        },
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out',
-                        'slide-in': 'slideIn 0.25s ease-out',
-                        'pulse-dot': 'pulseDot 2s ease-in-out infinite',
-                        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
-                        'float-subtle': 'floatSubtle 4s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(6px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        slideIn: { '0%': { opacity: '0', transform: 'translateX(-8px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
-                        pulseDot: { '0%,100%': { opacity: '1', transform: 'scale(1)' }, '50%': { opacity: '0.5', transform: 'scale(0.85)' } },
-                        glowPulse: { '0%,100%': { boxShadow: '0 0 0 0 rgba(91,127,255,0.4)' }, '50%': { boxShadow: '0 0 0 4px rgba(91,127,255,0)' } },
-                        floatSubtle: { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-3px)' } },
-                    }
-                }
-            }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MergeRelay by Alesis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['JetBrains Mono', 'monospace'],
+            display: ['Syne', 'sans-serif'],
+          },
+          colors: {
+            dark: {
+              bg: '#0d0f14',
+              surface: '#13161e',
+              panel: '#181c26',
+              border: '#252a38',
+              muted: '#2e3447',
+              text: '#e2e8f8',
+              sub: '#8892a8',
+              accent: '#5b7fff',
+              accent2: '#7c5bff',
+              ping: '#ff5b8a',
+            },
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-out',
+            'slide-in': 'slideIn 0.25s ease-out',
+            'pulse-dot': 'pulseDot 2s ease-in-out infinite',
+            'message-pop': 'messagePop 0.2s ease-out',
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0', transform: 'translateY(6px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            slideIn: { '0%': { opacity: '0', transform: 'translateX(-8px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
+            pulseDot: { '0%,100%': { opacity: '1', transform: 'scale(1)' }, '50%': { opacity: '0.5', transform: 'scale(0.85)' } },
+            messagePop: { '0%': { opacity: '0', transform: 'scale(0.98)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+          }
         }
-    </script>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
 
-        body {
-            background-color: #0d0f14;
-            color: #e2e8f8;
-            font-family: 'JetBrains Mono', monospace;
-        }
+    body {
+      background-color: #0d0f14;
+      color: #e2e8f8;
+      font-family: 'JetBrains Mono', monospace;
+    }
 
-        /* Scrollbar premium */
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #13161e; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #2e3447; border-radius: 10px; transition: background 0.2s; }
+    ::-webkit-scrollbar-thumb:hover { background: #5b7fff; }
 
-        ::-webkit-scrollbar-track {
-            background: #13161e;
-            border-radius: 10px;
-        }
+    .channel-item {
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      border-left: 2px solid transparent;
+    }
+    .channel-item.active {
+      background: #1e2436;
+      color: #e2e8f8;
+      border-left-color: #5b7fff;
+      box-shadow: inset 0 0 0 1px rgba(91, 127, 255, 0.1);
+    }
+    .channel-item:not(.active):hover {
+      background: #181c26;
+      color: #e2e8f8;
+      transform: translateX(2px);
+    }
 
-        ::-webkit-scrollbar-thumb {
-            background: #2e3447;
-            border-radius: 10px;
-            transition: background 0.2s;
-        }
+    .msg-row {
+      transition: background 0.15s, transform 0.1s;
+      border-radius: 12px;
+    }
+    .msg-row:hover { background: #13161e; }
+    .msg-actions { opacity: 0; transition: opacity 0.2s; }
+    .msg-row:hover .msg-actions { opacity: 1; }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #5b7fff;
-        }
+    .chat-input {
+      background: #181c26;
+      border: 1px solid #252a38;
+      color: #e2e8f8;
+      transition: all 0.2s;
+      outline: none;
+    }
+    .chat-input:focus-within {
+      border-color: #5b7fff;
+      box-shadow: 0 0 0 2px rgba(91, 127, 255, 0.2);
+    }
+    .chat-input input::placeholder { color: #4a5568; }
 
-        /* Sidebar channel items */
-        .channel-item {
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            border-left: 2px solid transparent;
-        }
+    .send-btn {
+      background: linear-gradient(135deg, #5b7fff, #7c5bff);
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    .send-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 4px 12px rgba(91, 127, 255, 0.3);
+    }
+    .send-btn:active:not(:disabled) { transform: translateY(1px); }
 
-        .channel-item.active {
-            background: #1e2436;
-            color: #e2e8f8;
-            border-left-color: #5b7fff;
-            box-shadow: inset 0 0 0 1px rgba(91, 127, 255, 0.1);
-        }
-
-        .channel-item:not(.active):hover {
-            background: #181c26;
-            color: #e2e8f8;
-            transform: translateX(2px);
-        }
-
-        /* Message bubbles */
-        .msg-row {
-            transition: background 0.15s, transform 0.1s;
-            border-radius: 12px;
-        }
-
-        .msg-row:hover {
-            background: #13161e;
-        }
-
-        .msg-actions {
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .msg-row:hover .msg-actions {
-            opacity: 1;
-        }
-
-        /* Avatar ring */
-        .avatar-ring {
-            background: linear-gradient(135deg, #5b7fff, #7c5bff);
-            padding: 2px;
-            border-radius: 50%;
-        }
-
-        .avatar-inner {
-            background: #13161e;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Connection status */
-        .connection-badge {
-            transition: all 0.2s;
-        }
-        .connection-badge.connected {
-            background: rgba(34, 197, 94, 0.15);
-            border-color: #22c55e;
-        }
-        .connection-badge.disconnected {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: #ef4444;
-        }
-
-        /* Input area */
-        .chat-input {
-            background: #181c26;
-            border: 1px solid #252a38;
-            color: #e2e8f8;
-            transition: all 0.2s;
-            outline: none;
-        }
-
-        .chat-input:focus-within {
-            border-color: #5b7fff;
-            box-shadow: 0 0 0 2px rgba(91, 127, 255, 0.2);
-        }
-
-        .chat-input input {
-            background: transparent;
-        }
-
-        .chat-input input::placeholder {
-            color: #4a5568;
-        }
-
-        /* Send button */
-        .send-btn {
-            background: linear-gradient(135deg, #5b7fff, #7c5bff);
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-
-        .send-btn:hover:not(:disabled) {
-            transform: translateY(-1px);
-            filter: brightness(1.05);
-            box-shadow: 0 4px 12px rgba(91, 127, 255, 0.3);
-        }
-
-        .send-btn:active:not(:disabled) {
-            transform: translateY(1px);
-        }
-
-        /* Online dot */
-        .online-dot {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 4px #22c55e;
-        }
-
-        /* Empty state */
-        .empty-chat-card {
-            background: rgba(19, 22, 30, 0.6);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(91, 127, 255, 0.2);
-        }
-
-        /* Dropdown menu */
-        .user-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            position: absolute;
-            right: 0;
-            top: 100%;
-            margin-top: 0.5rem;
-            background: #181c26;
-            border: 1px solid #252a38;
-            border-radius: 0.5rem;
-            min-width: 140px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-8px);
-            transition: all 0.15s ease;
-        }
-        .user-dropdown:hover .dropdown-content,
-        .user-dropdown:focus-within .dropdown-content {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            font-size: 0.75rem;
-            color: #e2e8f8;
-            transition: background 0.15s;
-            text-decoration: none;
-        }
-        .dropdown-item:hover {
-            background: #1e2436;
-        }
-        .dropdown-item.logout {
-            color: #ff5b8a;
-            border-top: 1px solid #252a38;
-        }
-        .dropdown-item.logout:hover {
-            background: #2a1a24;
-        }
-    </style>
+    .participant-item {
+      transition: background 0.15s;
+    }
+    .participant-item:hover {
+      background: #1e2436;
+    }
+    .role-badge {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 20px;
+      background: rgba(91, 127, 255, 0.15);
+      color: #5b7fff;
+    }
+    .role-badge.owner {
+      background: rgba(255, 91, 138, 0.15);
+      color: #ff5b8a;
+    }
+  </style>
 </head>
+<body class="h-screen flex flex-col overflow-hidden">
 
-<body class="h-screen flex flex-col overflow-hidden antialiased">
-
-    <!-- ═══════════════ HEADER ═══════════════ -->
-    <header class="flex items-center justify-between px-5 py-3 border-b shrink-0
-    bg-[#13161e] border-[#252a38]">
-
-        <div class="flex items-center gap-3">
-            <div>
-                <h1 class="font-display font-800 text-base leading-none tracking-tight text-[#e2e8f8]" style="font-weight:800;">
-                    MergeRelay
-                </h1>
-                <p class="text-[10px] text-[#5b7fff] font-mono tracking-widest uppercase mt-0.5">
-                    by Alesis
-                </p>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-            <!-- Connection status -->
-            <div id="connection-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full border connection-badge connected transition-all">
-                <div class="online-dot animate-pulse-dot"></div>
-                <span class="text-xs text-[#8892a8] hidden sm:block">conectado</span>
-            </div>
-            
-            <!-- User dropdown menu -->
-            <div class="user-dropdown">
-                <div class="flex items-center gap-2 cursor-pointer py-1 px-2 rounded-md hover:bg-[#1e2436] transition-colors">
-                    <div class="w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold"
-                        style="background: linear-gradient(135deg,#5b7fff,#7c5bff); color:#fff;">
-                        {{ user[0]|upper if user else 'U' }}
-                    </div>
-                    <span class="text-xs text-[#e2e8f8] hidden sm:block">{{ user }}</span>
-                    <svg class="w-3 h-3 text-[#8892a8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-                <div class="dropdown-content">
-                    <a href="/logout" class="dropdown-item logout">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Cerrar sesión
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- ═══════════════ BODY PRINCIPAL ═══════════════ -->
-    <div class="flex flex-1 overflow-hidden">
-
-        <!-- ── SIDEBAR (SOLO LISTA DE CANALES, SIN BADGE DE USUARIO) ── -->
-        <aside class="w-56 shrink-0 flex flex-col border-r overflow-hidden bg-[#13161e] border-[#252a38]">
-            <div class="px-3 pt-4 pb-2">
-                <p class="text-[10px] font-mono uppercase tracking-widest text-[#8892a8] px-2 mb-2">
-                    Canales
-                </p>
-                <div id="channel-list" class="flex flex-col gap-0.5">
-                    {% for channel in channels %}
-                    <div class="channel-item rounded-md px-3 py-2.5 text-[#8892a8] hover:text-[#e2e8f8] hover:bg-[#181c26]"
-                        onclick="selectChannel(this, '{{ channel.name }}', '{{ channel.short_description|replace("'", "\\'") }}', {{ channel.id }})"
-                        data-id="{{ channel.id }}" data-name="{{ channel.name }}"
-                        data-desc="{{ channel.short_description|replace("'", "\\'") }}">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[#5b7fff] font-bold text-xs">#</span>
-                            <span class="text-xs font-mono truncate">{{ channel.name }}</span>
-                        </div>
-                        {% if channel.short_description %}
-                        <p class="text-[10px] text-[#8892a8] truncate ml-4 mt-0.5 leading-tight">
-                            {{ channel.short_description }}
-                        </p>
-                        {% endif %}
-                    </div>
-                    {% else %}
-                    <div class="px-3 py-4 text-center">
-                        <p class="text-xs text-[#8892a8]">Sin canales</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <!-- Sidebar sin badge de usuario - eliminado completamente -->
-        </aside>
-
-        <!-- ── MAIN CHAT ── -->
-        <main class="flex-1 flex flex-col overflow-hidden bg-[#0d0f14]">
-
-            <!-- Channel header -->
-            <div class="flex items-center gap-3 px-5 py-3 border-b shrink-0 bg-[#13161e] border-[#252a38]">
-                <span class="text-[#5b7fff] font-bold text-lg">#</span>
-                <div>
-                    <h2 id="current-channel-name" class="text-sm font-bold text-[#e2e8f8] font-display">
-                        Ningún canal
-                    </h2>
-                    <p id="current-channel-desc" class="text-[11px] text-[#8892a8]">
-                        Selecciona un chat para empezar
-                    </p>
-                </div>
-                <div class="ml-auto flex items-center gap-1.5">
-                    <div class="online-dot animate-pulse-dot"></div>
-                    <span class="text-[11px] text-[#8892a8]">relay activo</span>
-                </div>
-            </div>
-
-            <!-- Messages area -->
-            <div id="messages" class="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-1">
-                <div id="empty-state-placeholder" class="flex flex-col items-center justify-center h-full min-h-[300px]">
-                    <div class="empty-chat-card rounded-2xl p-8 max-w-sm text-center backdrop-blur-sm">
-                        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#5b7fff]/20 to-[#7c5bff]/10 flex items-center justify-center border border-[#5b7fff]/20">
-                            <svg class="w-7 h-7 text-[#5b7fff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-white font-display font-bold text-lg mb-2">No has seleccionado ningún chat.</h3>
-                        <p class="text-[#8892a8] text-xs leading-relaxed">
-                            Elige un canal de la barra lateral para comenzar a conversar.<br>
-                            <span class="inline-block mt-2 text-[#5b7fff] text-[10px] font-mono">✦ WebSocket en tiempo real</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Input area -->
-            <div class="px-5 py-4 border-t shrink-0 bg-[#13161e] border-[#252a38]">
-                <form onsubmit="return false;" id="chat-form" class="flex items-center gap-3">
-                    <div class="flex-1 flex items-center gap-2 chat-input rounded-lg px-4 py-2.5">
-                        <span class="text-[#5b7fff] font-bold text-sm shrink-0">&gt;</span>
-                        <input id="msg-input" type="text" placeholder="Selecciona un canal para escribir..." disabled
-                            class="flex-1 bg-transparent text-xs outline-none font-mono chat-input border-none p-0 disabled:cursor-not-allowed disabled:opacity-60"
-                            style="border:none; background:transparent;" />
-                    </div>
-                    <button type="submit" id="send-button" disabled
-                        class="send-btn rounded-lg px-4 py-2.5 flex items-center gap-2 shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
-                        <span class="text-xs font-bold text-white hidden sm:block">Enviar</span>
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                </form>
-                <p class="text-[10px] text-[#2e3447] mt-1.5 ml-8">
-                    Presiona <kbd class="px-1 py-0.5 rounded bg-[#252a38] text-[#8892a8] text-[9px]">Enter</kbd> para enviar
-                </p>
-            </div>
-        </main>
+  <!-- HEADER -->
+  <header class="flex items-center justify-between px-5 py-3 border-b shrink-0 bg-[#13161e] border-[#252a38]">
+    <div class="flex items-center gap-3">
+      <div>
+        <h1 class="font-display font-800 text-base leading-none tracking-tight text-[#e2e8f8]" style="font-weight:800;">
+          MergeRelay
+        </h1>
+        <p class="text-[10px] text-[#5b7fff] font-mono tracking-widest uppercase mt-0.5">
+          by Alesis
+        </p>
+      </div>
     </div>
 
-    <script>
-        // ==================== WEBSOCKET IMPLEMENTACIÓN ====================
-        // URL relativa - usa el endpoint /chat/connect (sin necesidad de URL completa)
-        const WS_URL = "/chat/connect";
-        
-        let socket = null;
-        let wsConnected = false;
-        let currentChannel = null;      // { id, name, desc }
-        let reconnectAttempts = 0;
-        let reconnectInterval = null;
-        
-        // Datos del usuario (desde template)
-        const userId = {{ user_id|default(1) }};
-        const userLabel = "{{ user }}";
-        const userInitial = userLabel ? userLabel[0].toUpperCase() : 'U';
-        
-        // Elementos DOM
-        const messagesContainer = document.getElementById('messages');
-        const emptyStatePlaceholder = document.getElementById('empty-state-placeholder');
-        const channelNameSpan = document.getElementById('current-channel-name');
-        const channelDescSpan = document.getElementById('current-channel-desc');
-        const msgInput = document.getElementById('msg-input');
-        const chatForm = document.getElementById('chat-form');
-        const sendButton = document.getElementById('send-button');
-        const connectionStatusDiv = document.getElementById('connection-status');
-        
-        // ==================== Funciones de UI ====================
-        function escHtml(str) {
-            if (!str) return '';
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
-        
-        function getFormattedTime(timestamp) {
-            const date = timestamp ? new Date(timestamp * 1000) : new Date();
-            return date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
-        }
-        
-        function updateConnectionStatus(connected) {
-            wsConnected = connected;
-            if (connected) {
-                connectionStatusDiv.className = "flex items-center gap-2 px-3 py-1.5 rounded-full border connection-badge connected transition-all";
-                connectionStatusDiv.innerHTML = `<div class="online-dot animate-pulse-dot"></div><span class="text-xs text-[#8892a8] hidden sm:block">conectado</span>`;
-            } else {
-                connectionStatusDiv.className = "flex items-center gap-2 px-3 py-1.5 rounded-full border connection-badge disconnected transition-all";
-                connectionStatusDiv.innerHTML = `<div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div><span class="text-xs text-[#8892a8] hidden sm:block">desconectado</span>`;
-            }
-        }
-        
-        // Crear mensaje en el DOM
-        function appendMessage(senderName, content, timestamp, isOwn = false) {
-            const colorsPool = ['#5b7fff', '#7c5bff', '#ff5b8a', '#22c55e', '#f59e0b', '#a855f7'];
-            // Color determinista basado en el nombre para consistencia
-            let colorHash = 0;
-            for (let i = 0; i < senderName.length; i++) {
-                colorHash = ((colorHash << 5) - colorHash) + senderName.charCodeAt(i);
-                colorHash |= 0;
-            }
-            const color = colorsPool[Math.abs(colorHash) % colorsPool.length];
-            const timeStr = getFormattedTime(timestamp);
-            const initial = senderName ? senderName[0].toUpperCase() : '?';
-            
-            const row = document.createElement('div');
-            row.className = 'msg-row flex gap-3 py-1.5 px-2 rounded-md hover:bg-[#13161e] animate-fade-in group';
-            row.innerHTML = `
-                <div class="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs font-bold mt-0.5"
-                    style="background: linear-gradient(135deg, ${color}, #7c5bff); color:#fff;">
-                    ${escHtml(initial)}
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-baseline gap-2 mb-0.5">
-                        <span class="text-xs font-bold" style="color: ${color}">${escHtml(senderName)}</span>
-                        <span class="text-[10px] text-[#8892a8]">${timeStr}</span>
-                        ${isOwn ? '<span class="text-[9px] text-[#5b7fff] ml-1">✓</span>' : ''}
-                    </div>
-                    <p class="text-xs text-[#e2e8f8] leading-relaxed break-words">${escHtml(content)}</p>
-                </div>
-                <div class="msg-actions flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition">
-                    <button class="text-[#8892a8] hover:text-[#5b7fff] p-1 rounded text-[10px]">↩</button>
-                </div>
-            `;
-            return row;
-        }
-        
-        function addSystemMessage(text) {
-            const sysMsg = document.createElement('div');
-            sysMsg.className = 'flex justify-center my-2 animate-fade-in';
-            sysMsg.innerHTML = `<span class="text-[10px] text-[#8892a8] bg-[#181c26] px-3 py-1 rounded-full border border-[#252a38]">${escHtml(text)}</span>`;
-            messagesContainer.appendChild(sysMsg);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-        
-        function showEmptyState() {
-            messagesContainer.innerHTML = '';
-            messagesContainer.appendChild(emptyStatePlaceholder);
-            emptyStatePlaceholder.style.display = 'flex';
-        }
-        
-        function clearMessages() {
-            messagesContainer.innerHTML = '';
-        }
-        
-        // ==================== WebSocket ====================
-        function connectWebSocket() {
-            if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
-                console.log("WebSocket ya está conectado o conectando");
-                return;
-            }
-            
-            try {
-                // Usar URL relativa - las cookies se enviarán automáticamente
-                const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const wsUrl = `${wsProtocol}//${window.location.host}${WS_URL}`;
-                console.log("Conectando a WebSocket:", wsUrl);
-                
-                socket = new WebSocket(wsUrl);
-                
-                socket.onopen = () => {
-                    console.log("WebSocket conectado");
-                    updateConnectionStatus(true);
-                    reconnectAttempts = 0;
-                    if (reconnectInterval) {
-                        clearInterval(reconnectInterval);
-                        reconnectInterval = null;
-                    }
-                    addSystemMessage("Conectado al servidor MergeRelay");
-                };
-                
-                socket.onmessage = (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        console.log("Mensaje recibido:", data);
-                        
-                        if (data.type === "message") {
-                            if (currentChannel && data.channel_id === currentChannel.id) {
-                                const isOwn = (data.sender_id === userId);
-                                const msgElement = appendMessage(data.sender_name, data.content, data.timestamp, isOwn);
-                                if (emptyStatePlaceholder.parentNode === messagesContainer) {
-                                    clearMessages();
-                                }
-                                messagesContainer.appendChild(msgElement);
-                                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                            }
-                        } else if (data.type === "error") {
-                            addSystemMessage(`Error: ${data.message}`);
-                        } else if (data.type === "ack") {
-                            console.log("ACK recibido:", data);
-                        }
-                    } catch (e) {
-                        console.error("Error parsing message:", e);
-                    }
-                };
-                
-                socket.onclose = (event) => {
-                    console.log("WebSocket cerrado:", event);
-                    updateConnectionStatus(false);
-                    addSystemMessage("Desconectado del servidor. Reintentando...");
-                    
-                    if (!reconnectInterval) {
-                        reconnectInterval = setInterval(() => {
-                            if (!socket || socket.readyState === WebSocket.CLOSED) {
-                                console.log(`Reintentando conexión (${reconnectAttempts + 1})...`);
-                                connectWebSocket();
-                                reconnectAttempts++;
-                                if (reconnectAttempts > 10) {
-                                    clearInterval(reconnectInterval);
-                                    reconnectInterval = null;
-                                    addSystemMessage("No se pudo reconectar. Recarga la página.");
-                                }
-                            } else if (socket.readyState === WebSocket.OPEN) {
-                                clearInterval(reconnectInterval);
-                                reconnectInterval = null;
-                            }
-                        }, 5000);
-                    }
-                };
-                
-                socket.onerror = (error) => {
-                    console.error("WebSocket error:", error);
-                    updateConnectionStatus(false);
-                };
-                
-            } catch (e) {
-                console.error("Error creating WebSocket:", e);
-                updateConnectionStatus(false);
-            }
-        }
-        
-        // Enviar mensaje a través del WebSocket
-        function sendMessageViaWS(message, channelId) {
-            if (!socket || socket.readyState !== WebSocket.OPEN) {
-                addSystemMessage("No hay conexión con el servidor. Reintentando...");
-                connectWebSocket();
-                return false;
-            }
-            
-            const payload = {
-                type: "send_message",
-                message: message,
-                channel_id: channelId
-            };
-            
-            socket.send(JSON.stringify(payload));
-            return true;
-        }
-        
-        // ==================== Selección de canal ====================
-        function selectChannel(el, name, desc, channelId) {
-            document.querySelectorAll('.channel-item').forEach(c => {
-                c.classList.remove('active', 'bg-[#1e2436]', 'text-[#e2e8f8]');
-                c.classList.add('text-[#8892a8]');
-                c.style.borderLeftColor = 'transparent';
-            });
-            el.classList.add('active', 'bg-[#1e2436]', 'text-[#e2e8f8]');
-            el.classList.remove('text-[#8892a8]');
-            el.style.borderLeftColor = '#5b7fff';
-            
-            channelNameSpan.textContent = name;
-            channelDescSpan.textContent = desc || `Canal #${name} · mensajes seguros`;
-            
-            currentChannel = { id: channelId, name: name, desc: desc };
-            
-            clearMessages();
-            addSystemMessage(`Te has unido al canal #${name}`);
-            
-            msgInput.disabled = false;
-            sendButton.disabled = false;
-            msgInput.placeholder = `Mensaje en #${name}...`;
-            msgInput.focus();
-            
-            chatForm.onsubmit = (e) => {
-                e.preventDefault();
-                const rawText = msgInput.value.trim();
-                if (rawText && currentChannel && wsConnected) {
-                    if (sendMessageViaWS(rawText, currentChannel.id)) {
-                        msgInput.value = '';
-                        msgInput.focus();
-                    } else {
-                        addSystemMessage("Error de conexión. Intenta de nuevo.");
-                    }
-                } else if (!wsConnected) {
-                    addSystemMessage("Esperando conexión WebSocket...");
-                    connectWebSocket();
-                }
-                return false;
-            };
-        }
-        
-        // ==================== Inicialización ====================
-        window.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.channel-item').forEach(item => {
-                item.classList.remove('active', 'bg-[#1e2436]', 'text-[#e2e8f8]');
-                item.classList.add('text-[#8892a8]');
-            });
-            
-            channelNameSpan.textContent = 'Ningún canal';
-            channelDescSpan.textContent = 'Selecciona un chat para empezar';
-            currentChannel = null;
-            showEmptyState();
-            
-            msgInput.disabled = true;
-            sendButton.disabled = true;
-            chatForm.onsubmit = (e) => { e.preventDefault(); return false; };
-            
-            connectWebSocket();
-        });
-        
-        window.addEventListener('beforeunload', () => {
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                socket.close();
-            }
-        });
-    </script>
-</body>
+    <div class="flex items-center gap-4">
+      <div class="relative group">
+        <div class="flex items-center gap-2 cursor-pointer py-1 px-2 rounded-md hover:bg-[#1e2436] transition-colors">
+          <div class="w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold"
+            style="background: linear-gradient(135deg,#5b7fff,#7c5bff); color:#fff;">
+            {{ user[0]|upper if user else 'U' }}
+          </div>
+          <span class="text-xs text-[#e2e8f8] hidden sm:block">{{ user }}</span>
+          <svg class="w-3 h-3 text-[#8892a8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div class="absolute right-0 top-full mt-2 bg-[#181c26] border border-[#252a38] rounded-lg min-w-[140px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl z-50">
+          <a href="/logout" class="flex items-center gap-2 px-4 py-2 text-xs text-[#ff5b8a] hover:bg-[#1e2436] transition-colors rounded-lg">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Cerrar sesión
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
 
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- SIDEBAR - Canales -->
+    <aside class="w-56 shrink-0 flex flex-col border-r overflow-hidden bg-[#13161e] border-[#252a38]">
+      <div class="px-3 pt-4 pb-2 flex-1 overflow-y-auto flex flex-col">
+        <div class="flex items-center justify-between px-2 mb-3">
+          <p class="text-[10px] font-mono uppercase tracking-widest text-[#8892a8] font-semibold">Canales</p>
+          <div class="flex items-center gap-1">
+            <button onclick="openJoinModal()" title="Unirse a canal"
+              class="w-6 h-6 flex items-center justify-center rounded-md text-[#8892a8] hover:text-[#5b7fff] hover:bg-[#252a38] transition-all text-sm font-bold">
+              →
+            </button>
+            <button onclick="openCreateModal()" title="Crear canal"
+              class="w-6 h-6 flex items-center justify-center rounded-md text-[#8892a8] hover:text-[#5b7fff] hover:bg-[#252a38] transition-all text-base font-bold">
+              +
+            </button>
+          </div>
+        </div>
+
+        <div id="channel-list" class="flex flex-col gap-1">
+          {% for channel in channels %}
+          <div class="channel-item group rounded-md px-3 py-2.5 text-[#8892a8] hover:text-[#e2e8f8] hover:bg-[#181c26] transition-all"
+            onclick="selectChannel(this, {{ channel.id }})"
+            data-id="{{ channel.id }}"
+            data-name="{{ channel.name }}"
+            data-desc="{{ channel.short_description or '' }}">
+            <div class="flex items-center gap-2">
+              <span class="text-[#5b7fff] font-bold text-xs">#</span>
+              <span class="text-xs font-mono truncate flex-1">{{ channel.name }}</span>
+              <button onclick="event.stopPropagation(); leaveChannel({{ channel.id }})"
+                title="Salir"
+                class="opacity-0 group-hover:opacity-100 transition-all text-[#8892a8] hover:text-[#ff5b8a] text-[11px] leading-none px-1">
+                ✕
+              </button>
+            </div>
+            {% if channel.short_description %}
+            <p class="text-[10px] text-[#6a7088] truncate ml-4 mt-0.5 leading-tight">
+              {{ channel.short_description }}
+            </p>
+            {% endif %}
+          </div>
+          {% else %}
+          <div class="px-3 py-8 text-center">
+            <p class="text-xs text-[#8892a8]">Sin canales</p>
+            <p class="text-[10px] text-[#2e3447] mt-1">Usa + para crear uno</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CHAT + PARTICIPANTS PANEL -->
+    <div class="flex-1 flex overflow-hidden">
+      
+      <!-- Chat area -->
+      <main class="flex-1 flex flex-col overflow-hidden bg-[#0d0f14]">
+        <div class="flex items-center gap-3 px-5 py-3 border-b shrink-0 bg-[#13161e] border-[#252a38]">
+          <span class="text-[#5b7fff] font-bold text-lg">#</span>
+          <div class="flex-1">
+            <h2 id="current-channel-name" class="text-sm font-bold text-[#e2e8f8] font-display">
+              {% if channels %}{{ channels[0].name }}{% else %}—{% endif %}
+            </h2>
+            <p id="current-channel-desc" class="text-[11px] text-[#8892a8]">
+              {% if channels %}{{ channels[0].short_description or '' }}{% endif %}
+            </p>
+          </div>
+        </div>
+
+        <div id="messages" class="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-1">
+        </div>
+
+        <div class="px-5 py-4 border-t shrink-0 bg-[#13161e] border-[#252a38]">
+          <form onsubmit="sendMessage(event)" class="flex items-center gap-3">
+            <div class="flex-1 flex items-center gap-2 chat-input rounded-lg px-4 py-2.5">
+              <span class="text-[#5b7fff] font-bold text-sm shrink-0">&gt;</span>
+              <input id="msg-input" type="text" placeholder="Escribe un mensaje..." autocomplete="off"
+                class="flex-1 bg-transparent text-xs outline-none font-mono border-none p-0" />
+            </div>
+            <button type="submit" class="send-btn rounded-lg px-4 py-2.5 flex items-center gap-2 shrink-0">
+              <span class="text-xs font-bold text-white hidden sm:block">Enviar</span>
+              <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </form>
+          <p class="text-[10px] text-[#2e3447] mt-1.5 ml-8">
+            Presiona <kbd class="px-1.5 py-0.5 rounded-md bg-[#252a38] text-[#8892a8] text-[9px] font-mono">Enter</kbd> para enviar
+          </p>
+        </div>
+      </main>
+
+      <!-- Participants panel - SOLO nombre y rol, sin "conectado" -->
+      <div id="participants-panel" class="w-64 shrink-0 border-l border-[#252a38] bg-[#0f1117] flex flex-col overflow-hidden">
+        <div class="px-4 pt-4 pb-2">
+          <p class="text-[10px] font-mono uppercase tracking-widest text-[#8892a8] font-semibold">Participantes</p>
+          <p id="participants-count" class="text-[10px] text-[#6a7088] mt-1">0 participantes</p>
+        </div>
+        <div id="participants-list" class="flex-1 overflow-y-auto px-2 pb-2">
+          <div class="flex items-center justify-center py-8">
+            <div class="w-5 h-5 border-2 border-[#5b7fff] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODALS -->
+  <div id="modal-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden" onclick="closeModals()"></div>
+
+  <div id="modal-create" class="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-[#13161e] border border-[#252a38] rounded-xl p-6 hidden shadow-2xl">
+    <h3 class="font-display font-bold text-base text-[#e2e8f8] mb-1">Crear canal</h3>
+    <p class="text-[11px] text-[#8892a8] mb-4">Serás el propietario del canal.</p>
+    <div class="flex flex-col gap-3">
+      <div>
+        <label class="text-[10px] uppercase tracking-widest text-[#8892a8] block mb-1 font-semibold">Nombre</label>
+        <input id="create-name" type="text" placeholder="mi-canal"
+          class="w-full bg-[#0d0f14] border border-[#252a38] text-[#e2e8f8] rounded-lg px-3 py-2 text-xs font-mono outline-none focus:border-[#5b7fff] transition-colors" />
+      </div>
+      <div>
+        <label class="text-[10px] uppercase tracking-widest text-[#8892a8] block mb-1">Descripción <span class="normal-case text-[#2e3447]">(opcional)</span></label>
+        <input id="create-desc" type="text" placeholder="¿De qué trata este canal?"
+          class="w-full bg-[#0d0f14] border border-[#252a38] text-[#e2e8f8] rounded-lg px-3 py-2 text-xs font-mono outline-none focus:border-[#5b7fff] transition-colors" />
+      </div>
+      <p id="create-error" class="text-[11px] text-[#ff5b8a] hidden"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closeModals()" class="flex-1 px-4 py-2 rounded-lg text-xs font-bold text-[#8892a8] border border-[#252a38] hover:border-[#5b7fff] transition-colors">Cancelar</button>
+        <button onclick="submitCreateChannel()" class="flex-1 px-4 py-2 rounded-lg text-xs font-bold text-white" style="background: linear-gradient(135deg,#5b7fff,#7c5bff);">Crear →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-join" class="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-[#13161e] border border-[#252a38] rounded-xl p-6 hidden shadow-2xl">
+    <h3 class="font-display font-bold text-base text-[#e2e8f8] mb-1">Unirse a canal</h3>
+    <p class="text-[11px] text-[#8892a8] mb-4">Introduce el nombre exacto del canal.</p>
+    <div class="flex flex-col gap-3">
+      <div>
+        <label class="text-[10px] uppercase tracking-widest text-[#8892a8] block mb-1 font-semibold">Nombre del canal</label>
+        <div class="flex items-center gap-1 bg-[#0d0f14] border border-[#252a38] rounded-lg px-3 py-2 focus-within:border-[#5b7fff] transition-colors">
+          <span class="text-[#5b7fff] font-bold text-sm">#</span>
+          <input id="join-name" type="text" placeholder="nombre-del-canal" class="flex-1 bg-transparent text-[#e2e8f8] text-xs font-mono outline-none" />
+        </div>
+      </div>
+      <p id="join-error" class="text-[11px] text-[#ff5b8a] hidden"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closeModals()" class="flex-1 px-4 py-2 rounded-lg text-xs font-bold text-[#8892a8] border border-[#252a38] hover:border-[#5b7fff] transition-colors">Cancelar</button>
+        <button onclick="submitJoinChannel()" class="flex-1 px-4 py-2 rounded-lg text-xs font-bold text-white" style="background: linear-gradient(135deg,#5b7fff,#7c5bff);">Unirse →</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════
+    //  ESTADO GLOBAL
+    // ═══════════════════════════════════════════════
+    const USER_NAME = "{{ user }}";
+    const COLORS = ['#5b7fff','#7c5bff','#ff5b8a','#22c55e','#f59e0b','#06b6d4','#ec4899'];
+    function userColor(name) {
+      let h = 0;
+      for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+      return COLORS[h % COLORS.length];
+    }
+
+    const channelCache = {};
+    let activeChannelId = null;
+    let ws = null;
+    let wsReconnectTimer = null;
+
+    // ═══════════════════════════════════════════════
+    //  WEBSOCKET
+    // ═══════════════════════════════════════════════
+    function connectWS() {
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+      
+      const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+      ws = new WebSocket(`${proto}://${location.host}/chat/connect`);
+
+      ws.onopen = () => {
+        if (wsReconnectTimer) clearTimeout(wsReconnectTimer);
+      };
+
+      ws.onmessage = (evt) => {
+        try {
+          const data = JSON.parse(evt.data);
+          handleServerMessage(data);
+        } catch(e) { console.error(e); }
+      };
+
+      ws.onclose = () => {
+        wsReconnectTimer = setTimeout(connectWS, 3000);
+      };
+
+      ws.onerror = () => ws?.close();
+    }
+
+    // ═══════════════════════════════════════════════
+    //  PARTICIPANTS API
+    // ═══════════════════════════════════════════════
+    async function loadParticipants(channelId) {
+      const panel = document.getElementById('participants-list');
+      panel.innerHTML = `<div class="flex items-center justify-center py-8"><div class="w-5 h-5 border-2 border-[#5b7fff] border-t-transparent rounded-full animate-spin"></div></div>`;
+      
+      try {
+        const res = await fetch(`/api/channel/${channelId}/participants`);
+        if (!res.ok) throw new Error('Error loading participants');
+        const data = await res.json();
+        const participants = data.participants || [];
+        
+        const countText = participants.length === 1 ? '1 participante' : `${participants.length} participantes`;
+        document.getElementById('participants-count').textContent = countText;
+        
+        if (participants.length === 0) {
+          panel.innerHTML = `<div class="text-center py-8 text-[11px] text-[#6a7088]">Sin participantes</div>`;
+          return;
+        }
+        
+        // SOLO nombre y rol, sin el texto "conectado"
+        panel.innerHTML = participants.map(p => `
+          <div class="participant-item flex items-center gap-3 px-3 py-2 rounded-md transition-colors">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+              style="background: linear-gradient(135deg, ${userColor(p.name)}, #7c5bff); color:#fff;">
+              ${p.name ? p.name[0].toUpperCase() : '?'}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-xs font-mono font-medium text-[#e2e8f8] truncate">${escHtml(p.name)}</span>
+                ${p.role === 'owner' ? '<span class="role-badge owner text-[9px]">owner</span>' : 
+                   p.role === 'admin' ? '<span class="role-badge text-[9px]">admin</span>' : ''}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+        panel.innerHTML = `<div class="text-center py-8 text-[11px] text-[#ff5b8a]">Error al cargar</div>`;
+      }
+    }
+
+    // ═══════════════════════════════════════════════
+    //  MANEJO DE MENSAJES
+    // ═══════════════════════════════════════════════
+    function handleServerMessage(data) {
+      if (data.type === 'message') {
+        const ch = channelCache[data.channel_id];
+        if (!ch) return;
+        ch.messages = ch.messages || [];
+        ch.messages.push(data);
+        if (data.channel_id === activeChannelId) {
+          appendMessage(data);
+        } else {
+          markUnread(data.channel_id);
+        }
+      } else if (data.type === 'system') {
+        const ch = channelCache[data.channel_id];
+        if (!ch) return;
+        ch.messages = ch.messages || [];
+        ch.messages.push({ type: 'system', content: data.content, timestamp: data.timestamp });
+        if (data.channel_id === activeChannelId) {
+          appendSystemMessage(data.content);
+        }
+      }
+    }
+
+    function fmtTime(ts) {
+      const d = new Date(ts * 1000);
+      return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function appendMessage(data) {
+      const msgs = document.getElementById('messages');
+      const color = userColor(data.sender_name);
+      const initial = data.sender_name ? data.sender_name[0].toUpperCase() : '?';
+      
+      const row = document.createElement('div');
+      row.className = 'msg-row flex gap-3 py-1.5 px-2 rounded-md hover:bg-[#13161e] animate-message-pop';
+      row.innerHTML = `
+        <div class="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs font-bold mt-0.5"
+          style="background: linear-gradient(135deg,${color},#7c5bff); color:#fff;">
+          ${escHtml(initial)}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-baseline gap-2 mb-0.5">
+            <span class="text-xs font-bold" style="color:${color}">${escHtml(data.sender_name)}</span>
+            <span class="text-[10px] text-[#8892a8]">${fmtTime(data.timestamp)}</span>
+          </div>
+          <p class="text-xs text-[#e2e8f8] leading-relaxed break-words">${escHtml(data.content)}</p>
+        </div>
+        <div class="msg-actions flex items-center gap-1 shrink-0">
+          <button class="text-[#8892a8] hover:text-[#5b7fff] p-1 rounded text-[10px] transition-colors">↩</button>
+        </div>
+      `;
+      msgs.appendChild(row);
+      scrollToBottom();
+    }
+
+    function appendSystemMessage(text) {
+      const msgs = document.getElementById('messages');
+      const el = document.createElement('div');
+      el.className = 'flex justify-center my-2 animate-fade-in';
+      el.innerHTML = `<span class="text-[10px] text-[#8892a8] bg-[#181c26] px-3 py-1 rounded-full border border-[#252a38]">${escHtml(text)}</span>`;
+      msgs.appendChild(el);
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      const msgs = document.getElementById('messages');
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function renderChannelHistory(channelId) {
+      const msgs = document.getElementById('messages');
+      msgs.innerHTML = '';
+      const ch = channelCache[channelId];
+      if (!ch || !ch.messages) return;
+      for (const m of ch.messages) {
+        if (m.type === 'system') appendSystemMessage(m.content);
+        else if (m.type === 'message') appendMessage(m);
+      }
+    }
+
+    function markUnread(channelId) {
+      const item = document.querySelector(`.channel-item[data-id="${channelId}"]`);
+      if (!item || item.querySelector('.unread-badge')) return;
+      const badge = document.createElement('span');
+      badge.className = 'unread-badge ml-auto w-1.5 h-1.5 rounded-full bg-[#5b7fff] shrink-0';
+      const flexDiv = item.querySelector('.flex');
+      if (flexDiv) flexDiv.appendChild(badge);
+    }
+
+    function clearUnread(channelId) {
+      const badge = document.querySelector(`.channel-item[data-id="${channelId}"] .unread-badge`);
+      if (badge) badge.remove();
+    }
+
+    // ═══════════════════════════════════════════════
+    //  SELECCIÓN DE CANAL
+    // ═══════════════════════════════════════════════
+    async function selectChannel(el, channelId) {
+      if (activeChannelId === channelId) return;
+      activeChannelId = channelId;
+
+      document.querySelectorAll('.channel-item').forEach(c => {
+        c.classList.remove('active', 'bg-[#1e2436]', 'text-[#e2e8f8]');
+        c.classList.add('text-[#8892a8]');
+      });
+      el.classList.add('active', 'bg-[#1e2436]', 'text-[#e2e8f8]');
+      el.classList.remove('text-[#8892a8]');
+
+      clearUnread(channelId);
+      
+      const ch = channelCache[channelId];
+      document.getElementById('current-channel-name').textContent = ch ? ch.name : '';
+      document.getElementById('current-channel-desc').textContent = ch ? (ch.desc || '') : '';
+      
+      renderChannelHistory(channelId);
+      
+      loadParticipants(channelId).catch(err => console.warn('Error loading participants:', err));
+    }
+
+    // ═══════════════════════════════════════════════
+    //  ENVIAR MENSAJE
+    // ═══════════════════════════════════════════════
+    function sendMessage(e) {
+      e.preventDefault();
+      if (!activeChannelId) return;
+      const input = document.getElementById('msg-input');
+      const text = input.value.trim();
+      if (!text) return;
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        appendSystemMessage('⚠️ Desconectado, reconectando...');
+        connectWS();
+        return;
+      }
+      ws.send(JSON.stringify({
+        type: 'send_message',
+        channel_id: activeChannelId,
+        message: text
+      }));
+      input.value = '';
+    }
+
+    // ═══════════════════════════════════════════════
+    //  API CHANNELS
+    // ═══════════════════════════════════════════════
+    async function submitCreateChannel() {
+      const name = document.getElementById('create-name').value.trim();
+      const desc = document.getElementById('create-desc').value.trim();
+      const errEl = document.getElementById('create-error');
+      if (!name) { showModalError(errEl, 'El nombre es obligatorio.'); return; }
+
+      try {
+        const res = await fetch('/api/create_channel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channel_name: name, channel_description: desc })
+        });
+        if (!res.ok) {
+          const d = await res.json();
+          showModalError(errEl, d.message || 'Error al crear canal.');
+          return;
+        }
+        closeModals();
+        location.reload();
+      } catch {
+        showModalError(errEl, 'Error de red.');
+      }
+    }
+
+    async function submitJoinChannel() {
+      const name = document.getElementById('join-name').value.trim();
+      const errEl = document.getElementById('join-error');
+      if (!name) { showModalError(errEl, 'Introduce un nombre de canal.'); return; }
+
+      try {
+        const res = await fetch(`/api/join_channel/${encodeURIComponent(name)}`, { method: 'POST' });
+        if (!res.ok) {
+          const d = await res.json();
+          if (d.banned) { showModalError(errEl, `Estás baneado: ${d.reason || 'sin razón'}`); return; }
+          showModalError(errEl, d.message || 'No se pudo unir.');
+          return;
+        }
+        closeModals();
+        location.reload();
+      } catch {
+        showModalError(errEl, 'Error de red.');
+      }
+    }
+
+    async function leaveChannel(channelId) {
+      if (!confirm('¿Salir del canal?')) return;
+      try {
+        await fetch(`/api/leave_channel/${channelId}`, { method: 'POST' });
+        location.reload();
+      } catch { /* ignore */ }
+    }
+
+    function openCreateModal() {
+      document.getElementById('create-name').value = '';
+      document.getElementById('create-desc').value = '';
+      document.getElementById('create-error').classList.add('hidden');
+      document.getElementById('modal-create').classList.remove('hidden');
+      document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    function openJoinModal() {
+      document.getElementById('join-name').value = '';
+      document.getElementById('join-error').classList.add('hidden');
+      document.getElementById('modal-join').classList.remove('hidden');
+      document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    function closeModals() {
+      document.getElementById('modal-overlay').classList.add('hidden');
+      document.getElementById('modal-create').classList.add('hidden');
+      document.getElementById('modal-join').classList.add('hidden');
+    }
+
+    function showModalError(el, msg) {
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModals();
+      if (e.key === 'Enter' && !document.getElementById('modal-create').classList.contains('hidden')) submitCreateChannel();
+      if (e.key === 'Enter' && !document.getElementById('modal-join').classList.contains('hidden')) submitJoinChannel();
+    });
+
+    // ═══════════════════════════════════════════════
+    //  INICIALIZACIÓN
+    // ═══════════════════════════════════════════════
+    (function init() {
+      document.querySelectorAll('.channel-item[data-id]').forEach(el => {
+        const id = parseInt(el.dataset.id);
+        const name = el.dataset.name;
+        const desc = el.dataset.desc || '';
+        channelCache[id] = { name, desc, messages: [] };
+      });
+
+      const firstItem = document.querySelector('.channel-item[data-id]');
+      if (firstItem) {
+        const id = parseInt(firstItem.dataset.id);
+        activeChannelId = id;
+        firstItem.classList.add('active', 'bg-[#1e2436]', 'text-[#e2e8f8]');
+        firstItem.classList.remove('text-[#8892a8]');
+        const ch = channelCache[id];
+        document.getElementById('current-channel-name').textContent = ch ? ch.name : '';
+        document.getElementById('current-channel-desc').textContent = ch ? (ch.desc || '') : '';
+        appendSystemMessage(`Te has unido al canal #${ch?.name || ''}`);
+        loadParticipants(id).catch(console.error);
+      }
+
+      connectWS();
+    })();
+  </script>
+</body>
 </html>

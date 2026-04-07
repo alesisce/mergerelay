@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, Depends, HTTPException, WebSocket, WebSocketDisconnect, WebSocketException
 from source.dependencies import get_db, get_autenticated_user_websocket, Database, Protocol, get_protocol
+import time
 
 websocket = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -15,11 +16,18 @@ async def websocket_handler(ws: WebSocket, user: dict = Depends(get_autenticated
                 content = client_response.get("message")
                 channel_id = client_response.get("channel_id")
                 await protocol.broadcast(
-                    sender_id=user["id"],
                     channel_id=channel_id,
-                    message=content,
-                    username=user["name"]
+                    data={
+                        "type": "message",
+                        "channel_id": channel_id,
+                        "sender_id": user["id"],
+                        "sender_name": user["name"],
+                        "timestamp": time.time(),
+                        "content": content
+                    }
                 )
 
     except (WebSocketDisconnect, WebSocketException):
         await protocol.handle_disconnection(user["id"])
+    except Exception as e:
+        print(e)
