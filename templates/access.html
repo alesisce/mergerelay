@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MergeRelay by Alesis — Acceder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Syne:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'monospace'],
+                        display: ['Syne', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.35s ease-out',
+                        'slide-up': 'slideUp 0.35s ease-out',
+                        'pulse-dot': 'pulseDot 2s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(14px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        pulseDot: { '0%,100%': { opacity: '1', transform: 'scale(1)' }, '50%': { opacity: '0.5', transform: 'scale(0.85)' } },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0d0f14;
+            color: #e2e8f8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2e3447;
+            border-radius: 4px;
+        }
+
+        /* Card */
+        .auth-card {
+            background: #13161e;
+            border: 1px solid #252a38;
+        }
+
+        /* Tab */
+        .tab-btn {
+            position: relative;
+            color: #8892a8;
+            font-size: 12px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: color 0.2s;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            right: 50%;
+            height: 2px;
+            background: #5b7fff;
+            border-radius: 2px 2px 0 0;
+            transition: left 0.25s, right 0.25s;
+        }
+
+        .tab-btn.active {
+            color: #e2e8f8;
+        }
+
+        .tab-btn.active::after {
+            left: 12px;
+            right: 12px;
+        }
+
+        /* Input */
+        .auth-input {
+            width: 100%;
+            background: #0d0f14;
+            border: 1px solid #252a38;
+            color: #e2e8f8;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .auth-input:focus {
+            border-color: #5b7fff;
+        }
+
+        .auth-input::placeholder {
+            color: #2e3447;
+        }
+
+        /* Label */
+        .auth-label {
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #8892a8;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* Submit btn */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #5b7fff, #7c5bff);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 11px;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.01);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            border-top: 1px solid #252a38;
+        }
+
+        /* Panel form */
+        .form-panel {
+            display: none;
+        }
+
+        .form-panel.active {
+            display: block;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        /* Online dot */
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        /* Error/success flash */
+        .flash {
+            font-size: 11px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        .flash.error {
+            background: rgba(255, 91, 138, 0.12);
+            border: 1px solid rgba(255, 91, 138, 0.3);
+            color: #ff5b8a;
+            display: block;
+        }
+
+        .flash.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            display: block;
+        }
+
+        /* Watermark grid */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(91, 127, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(91, 127, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <div class="bg-grid"></div>
+
+    <!-- ═══════════════ HEADER ═══════════════ -->
+    <header class="flex items-center justify-between px-5 py-3 border-b shrink-0 relative z-10
+    bg-[#13161e] border-[#252a38]">
+
+        <div class="flex items-center gap-3">
+            <div>
+                <h1 class="font-display text-base leading-none tracking-tight text-[#e2e8f8]" style="font-weight:800;">
+                    MergeRelay
+                </h1>
+                <p class="text-[10px] text-[#5b7fff] font-mono tracking-widest uppercase mt-0.5">
+                    by Alesis
+                </p>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- ═══════════════ MAIN ═══════════════ -->
+    <main class="flex-1 flex items-center justify-center px-4 py-12 relative z-10">
+        <div class="w-full max-w-sm animate-slide-up">
+
+            <!-- Top label -->
+            <div class="flex items-center gap-2 mb-6">
+                <div class="online-dot animate-pulse-dot"></div>
+                <span class="text-[11px] text-[#8892a8] tracking-widest uppercase">
+                    Autenticación requerida
+                </span>
+            </div>
+
+            <!-- Card -->
+            <div class="auth-card rounded-xl overflow-hidden">
+
+                <!-- Tabs -->
+                <div class="flex border-b border-[#252a38]" id="tab-bar">
+                    <button class="tab-btn active flex-1" onclick="switchTab('login')" id="tab-login">
+                        Acceder
+                    </button>
+                    <button class="tab-btn flex-1" onclick="switchTab('register')" id="tab-register">
+                        Registrarse
+                    </button>
+                </div>
+
+                <!-- Forms container -->
+                <div class="p-6">
+
+                    <!-- Flash message -->
+                    <div id="flash-msg" class="flash" style="display:none;"></div>
+
+                    <!-- ── LOGIN FORM ── -->
+                    <div id="panel-login" class="form-panel active">
+                        <p class="text-[11px] text-[#8892a8] mb-5 leading-relaxed">
+                            Introduce tus credenciales para conectarte al relay.
+                        </p>
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="auth-label" for="login-user">Usuario</label>
+                                <input class="auth-input" type="text" id="login-user" name="username"
+                                    placeholder="tu_usuario" autocomplete="username" required />
+                            </div>
+                            <div>
+                                <label class="auth-label" for="login-pass">Contraseña</label>
+                                <input class="auth-input" type="password" id="login-pass" name="password"
+                                    placeholder="••••••••" autocomplete="current-password" required />
+                            </div>
+                            <hr class="divider my-1" />
+                            <button class="submit-btn" onclick="handleLogin()">
+                                Conectar →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ── REGISTER FORM ── -->
+                    <div id="panel-register" class="form-panel">
+                        <p class="text-[11px] text-[#8892a8] mb-5 leading-relaxed">
+                            Crea tu cuenta para unirte a los canales.
+                        </p>
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="auth-label" for="reg-user">Nombre de usuario</label>
+                                <input class="auth-input" type="text" id="reg-user" name="username"
+                                    placeholder="tu_usuario" autocomplete="username" required />
+                            </div>
+                            <div>
+                                <label class="auth-label" for="reg-pass">Contraseña</label>
+                                <input class="auth-input" type="password" id="reg-pass" name="password"
+                                    placeholder="••••••••" autocomplete="new-password" required
+                                    oninput="checkStrength(this.value)" />
+                                <!-- Password strength bar -->
+                                <div class="flex gap-1 mt-2" id="strength-bar">
+                                    <div class="h-0.5 flex-1 rounded bg-[#252a38]" id="s1"></div>
+                                    <div class="h-0.5 flex-1 rounded bg-[#252a38]" id="s2"></div>
+                                    <div class="h-0.5 flex-1 rounded bg-[#252a38]" id="s3"></div>
+                                    <div class="h-0.5 flex-1 rounded bg-[#252a38]" id="s4"></div>
+                                </div>
+                                <p id="strength-label" class="text-[10px] text-[#8892a8] mt-1"></p>
+                            </div>
+                            <div>
+                                <label class="auth-label" for="reg-pass2">Confirmar contraseña</label>
+                                <input class="auth-input" type="password" id="reg-pass2" name="password2"
+                                    placeholder="••••••••" autocomplete="new-password" required />
+                            </div>
+                            <hr class="divider my-1" />
+                            <button class="submit-btn" onclick="handleRegister()">
+                                Crear cuenta →
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer note -->
+            <p class="text-center text-[10px] text-[#2e3447] mt-5 tracking-wide">
+                MergeRelay · Conexión cifrada
+            </p>
+
+        </div>
+    </main>
+
+    <script>
+        // ── Flash ──
+        function showFlash(msg, type) {
+            const el = document.getElementById('flash-msg');
+            el.textContent = msg;
+            el.className = 'flash ' + type;
+            el.style.display = 'block';
+        }
+
+        // ── Tabs ──
+        function switchTab(tab) {
+            ['login', 'register'].forEach(t => {
+                document.getElementById('panel-' + t).classList.remove('active');
+                document.getElementById('tab-' + t).classList.remove('active');
+            });
+            document.getElementById('panel-' + tab).classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('flash-msg').style.display = 'none';
+        }
+
+        // ── Login ──
+        async function handleLogin() {
+            const username = document.getElementById('login-user').value.trim();
+            const password = document.getElementById('login-pass').value;
+            if (!username || !password) return showFlash('Rellena todos los campos.', 'error');
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    window.location.href = '/';
+                } else {
+                    showFlash(data.message || 'Credenciales incorrectas.', 'error');
+                }
+            } catch {
+                showFlash('Error de conexión con el servidor.', 'error');
+            }
+        }
+
+        // ── Register ──
+        async function handleRegister() {
+            const username = document.getElementById('reg-user').value.trim();
+            const password = document.getElementById('reg-pass').value;
+            const password2 = document.getElementById('reg-pass2').value;
+            if (!username || !password || !password2) return showFlash('Rellena todos los campos.', 'error');
+            if (password !== password2) return showFlash('Las contraseñas no coinciden.', 'error');
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    switchTab('login');
+                    showFlash(data.message || 'Cuenta creada. Inicia sesión.', 'success');
+                } else {
+                    showFlash(data.message || 'Error al registrar.', 'error');
+                }
+            } catch {
+                showFlash('Error de conexión con el servidor.', 'error');
+            }
+        }
+
+        // ── Password strength ──
+        function checkStrength(val) {
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+
+            const colors = ['#ff5b8a', '#f59e0b', '#5b7fff', '#22c55e'];
+            const labels = ['Débil', 'Regular', 'Buena', 'Fuerte'];
+            const bars = ['s1', 's2', 's3', 's4'];
+
+            bars.forEach((id, i) => {
+                document.getElementById(id).style.background = i < score ? colors[score - 1] : '#252a38';
+            });
+
+            const lbl = document.getElementById('strength-label');
+            lbl.textContent = val.length ? labels[score - 1] || '' : '';
+            lbl.style.color = score ? colors[score - 1] : '#8892a8';
+        }
+
+        // Auto-switch tab based on URL hash
+        if (location.hash === '#register') switchTab('register');
+    </script>
+</body>
+
+</html>
