@@ -1,6 +1,6 @@
 import uvicorn
-from fastapi import FastAPI
-from source.database import Database
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from source.config import Config
 import pathlib, uvicorn
 
@@ -30,6 +30,11 @@ from router.websocket import websocket
 app.include_router(pages)
 app.include_router(api)
 app.include_router(websocket)
+
+# Añadir handlers
+@app.exception_handler(403)
+async def error_403(request: Request, exc: Exception):
+    return RedirectResponse("/access")
 
 if __name__ == "__main__":
     uvicorn.run("main:app",
