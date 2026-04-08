@@ -27,3 +27,9 @@ async def index(request: Request, db: Database = Depends(get_db)):
         name="access.html",
         context={}
     )
+
+@pages.get("/logout")
+async def logout(request: Request, user: dict = Depends(get_autenticated_user)):
+    response = RedirectResponse("/access", status_code=303)
+    response.delete_cookie("token")
+    return response

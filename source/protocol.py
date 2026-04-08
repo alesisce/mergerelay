@@ -9,6 +9,7 @@ class Protocol(object):
     
     async def handle_connection(self, user_id: int, socket: WebSocket):
         if user_id in self.actives: # No pueden haber mas de dos conexiones simultáneas
+            await socket.close()
             return False
         self.actives[user_id] = socket
         await socket.accept()

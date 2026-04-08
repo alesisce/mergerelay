@@ -85,9 +85,9 @@ async def leave_channel(id: int, db: Database = Depends(get_db), user: dict = De
         }, status_code=400)
 
     await protocol.broadcast(id, {
-        "type": "system",
+        "type": "user_left",
         "timestamp": time.time(),
-        "content": f"The user {user["name"]} has left the channel."
+        "user": user["name"]
     })
 
     if not db.has_participants(id):
@@ -119,9 +119,9 @@ async def join_channel(channel_name: str, db: Database = Depends(get_db), user: 
         }, status_code=400)
     
     await protocol.broadcast(channel["id"], {
-        "type": "system",
+        "type": "user_joined",
         "timestamp": time.time(),
-        "content": f"The user {user["name"]} has joined the channel."
+        "user": user["name"]
     })
 
     return JSONResponse({

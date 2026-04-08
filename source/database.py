@@ -11,7 +11,8 @@ class Database:
             host=host,
             user=user,
             password=password,
-            database=database
+            database=database,
+            autocommit=True
         )
 
         self.setup_tables()
@@ -327,6 +328,19 @@ class Database:
                 (user_id,)
             )
             return cursor.fetchone()
+        finally:
+            cursor.close()
+            conn.close()
+
+    def create_channel(self, name, description):
+        conn, cursor = self.get_cursor()
+        try:
+            sql = "INSERT INTO channels (name, short_description) VALUES (%s, %s)"
+            cursor.execute(sql, (name, description))
+            return cursor.lastrowid
+        except Error as e:
+            print(f"Error creando canal: {e}")
+            return None
         finally:
             cursor.close()
             conn.close()
