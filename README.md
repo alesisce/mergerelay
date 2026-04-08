@@ -14,7 +14,7 @@ The project is primarily intended as a **technical demonstration and experimenta
 >
 > Public demo:
 >
-> [https://mergereplay.alesis.buzz](https://mergereplay.alesis.buzz)
+> [https://mergerelay.alesis.buzz](https://mergerelay.alesis.buzz)
 >
 > The demo **does not store or process passwords or private personal data**.
 
@@ -167,7 +167,7 @@ This repository exists for **experimentation and learning purposes only**.
 
 A public testing instance is available at:
 
-[https://mergereplay.alesis.buzz](https://mergereplay.alesis.buzz)
+[https://mergerelay.alesis.buzz](https://mergerelay.alesis.buzz)
 
 This instance exists only to **demonstrate the system behavior** and may be unstable.
 
